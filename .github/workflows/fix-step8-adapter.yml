@@ -38,8 +38,6 @@ jobs:
           if len(positions) != 2:
               raise SystemExit(f'Expected exactly 2 adapter definitions before repair; found {len(positions)}')
 
-          # Remove only the later duplicate, using lexical brace matching while
-          # ignoring strings, line comments and block comments.
           p = positions[1]
           brace = text.find('{', p + len('function getEDBBookingForNewUI(bookingId)'))
           if brace < 0:
@@ -87,7 +85,6 @@ jobs:
           else:
               raise SystemExit('Could not find matching brace for second adapter')
 
-          # The remaining adapter must use the header map contract.
           old = 'getEDBAutomaticDisplayState(values, headers)'
           new = 'getEDBAutomaticDisplayState(values, headerMap)'
           if text.count(old) != 1:
@@ -98,9 +95,7 @@ jobs:
               raise SystemExit('Repair failed: adapter definition count is not 1')
           if old in text:
               raise SystemExit('Repair failed: incorrect lifecycle call remains')
-          if 'SpreadsheetApp.openById(\n    \'1hHdFRgj1YnBqQATLd94iEGuRDqxOIsQEd8w1DKmYQfQ\'' in text:
-              raise SystemExit('Repair failed: hard-coded production spreadsheet reference remains')
-          if "SpreadsheetApp.openById('1hHdFRgj1YnBqQATLd94iEGuRDqxOIsQEd8w1DKmYQfQ')" in text:
+          if '1hHdFRgj1YnBqQATLd94iEGuRDqxOIsQEd8w1DKmYQfQ' in text:
               raise SystemExit('Repair failed: hard-coded production spreadsheet reference remains')
 
           path.write_text(text, encoding='utf-8')
