@@ -19,7 +19,7 @@ jobs:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
 
-      - name: Repair duplicate adapter and lifecycle call
+      - name: Remove duplicate Step 8 adapter
         shell: python
         run: |
           from pathlib import Path
@@ -86,21 +86,13 @@ jobs:
           else:
               raise SystemExit('Could not find matching brace for second adapter')
 
-          old = 'getEDBAutomaticDisplayState(values, headers)'
-          new = 'getEDBAutomaticDisplayState(values, headerMap)'
-          if text.count(old) != 1:
-              raise SystemExit(f'Expected exactly one incorrect lifecycle call; found {text.count(old)}')
-          text = text.replace(old, new, 1)
-
           if text.count(needle) != 1:
               raise SystemExit('Repair failed: adapter definition count is not 1')
-          if old in text:
-              raise SystemExit('Repair failed: incorrect lifecycle call remains')
           if '1hHdFRgj1YnBqQATLd94iEGuRDqxOIsQEd8w1DKmYQfQ' in text:
               raise SystemExit('Repair failed: hard-coded production spreadsheet reference remains')
 
           path.write_text(text, encoding='utf-8')
-          print('Step 8 source repair verified.')
+          print('Step 8 duplicate adapter removal verified.')
 
       - name: Commit repair and remove workflow
         shell: bash
