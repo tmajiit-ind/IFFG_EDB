@@ -10620,7 +10620,7 @@ function getEDBBookingForNewUI(bookingId) {
 
     lifecycle: String(
       typeof getEDBAutomaticDisplayState === 'function'
-        ? getEDBAutomaticDisplayState(values, headers)
+        ? getEDBAutomaticDisplayState(values, headerMap)
         : ''
     )
   };
