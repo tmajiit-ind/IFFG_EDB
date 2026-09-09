@@ -5,7 +5,24 @@
 
 function runEDBStep8AdapterTest() {
 
-  var bookingId = 'IFFG-EDB-00011';
+  var ss = getEDBSpreadsheet();
+  var dashboard = ss.getSheetByName('EDB Dashboard');
+
+  if (!dashboard) {
+    throw new Error(
+      'STEP 8 TEST FAILED: EDB Dashboard sheet not found.'
+    );
+  }
+
+  var bookingId = String(
+    dashboard.getRange('K3').getDisplayValue() || ''
+  ).trim();
+
+  if (!bookingId) {
+    throw new Error(
+      'STEP 8 TEST FAILED: EDB Dashboard K3 has no selected Booking ID.'
+    );
+  }
 
   Logger.log(
     'STEP 8 TEST START: ' + bookingId
@@ -16,7 +33,7 @@ function runEDBStep8AdapterTest() {
 
   if (!before) {
     throw new Error(
-      'STEP 8 TEST FAILED: No result returned.'
+      'STEP 8 TEST FAILED: No result returned for ' + bookingId
     );
   }
 
