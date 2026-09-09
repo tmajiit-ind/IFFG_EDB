@@ -7,10 +7,17 @@ function runEDBStep8AdapterTest() {
 
   var ss = getEDBSpreadsheet();
   var dashboard = ss.getSheetByName('EDB Dashboard');
+  var responseSheet = getEDBResponseSheet(ss);
 
   if (!dashboard) {
     throw new Error(
       'STEP 8 TEST FAILED: EDB Dashboard sheet not found.'
+    );
+  }
+
+  if (!responseSheet) {
+    throw new Error(
+      'STEP 8 TEST FAILED: Response Sheet could not be resolved.'
     );
   }
 
@@ -23,6 +30,28 @@ function runEDBStep8AdapterTest() {
       'STEP 8 TEST FAILED: EDB Dashboard K3 has no selected Booking ID.'
     );
   }
+
+  function snapshotSheet(sheet) {
+    var lastRow = sheet.getLastRow();
+    var lastColumn = sheet.getLastColumn();
+
+    if (lastRow < 1 || lastColumn < 1) {
+      return JSON.stringify([]);
+    }
+
+    return JSON.stringify(
+      sheet.getRange(1, 1, lastRow, lastColumn).getValues().map(function(row) {
+        return row.map(function(value) {
+          if (value instanceof Date) {
+            return value.toISOString();
+          }
+          return String(value === null || value === undefined ? '' : value);
+        });
+      })
+    );
+  }
+
+  var beforeSnapshot = snapshotSheet(responseSheet);
 
   Logger.log(
     'STEP 8 TEST START: ' + bookingId
@@ -51,6 +80,14 @@ function runEDBStep8AdapterTest() {
   ) {
     throw new Error(
       'STEP 8 TEST FAILED: Row number missing.'
+    );
+  }
+
+  var afterSnapshot = snapshotSheet(responseSheet);
+
+  if (beforeSnapshot !== afterSnapshot) {
+    throw new Error(
+      'STEP 8 TEST FAILED: Response Sheet changed during read-only adapter call.'
     );
   }
 
@@ -97,6 +134,10 @@ function runEDBStep8AdapterTest() {
   Logger.log(
     'Lifecycle = ' +
     before.lifecycle
+  );
+
+  Logger.log(
+    'READ-ONLY INTEGRITY PASS: Response Sheet unchanged.'
   );
 
   Logger.log(
