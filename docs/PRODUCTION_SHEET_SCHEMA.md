@@ -15,35 +15,24 @@ This document is the structural reference for the IFFG Electronic Display Board 
 
 ## Confirmed physical mapping
 
+The following physical positions are independently established in the project baseline:
+
 | Column | Sheet column number | Header | Structural role |
 |---|---:|---|---|
 | N | 14 | Email Address | Form response field |
 | **O** | **15** | **Booking ID** | **Primary EDB booking key** |
 | P | 16 | Media File Name | Media/admin field |
-| Q | 17 | Media Size (MB) | Media/admin field |
-| R | 18 | Media MIME Type | Media/admin field |
-| S | 19 | Media Drive Link | Media/admin field |
-| T | 20 | Media Validation | Media/admin field |
-| U | 21 | Validation Remarks | Media/admin field |
-| V | 22 | Base Charge | Pricing/admin field |
-| W | 23 | GST | Pricing/admin field |
-| X | 24 | Total Payable | Pricing/admin field |
-| Y | 25 | Payment Status | Payment/admin field |
-| Z | 26 | Payment UTR / Reference | Payment/admin field |
-| AA | 27 | Payment Date | Payment/admin field |
-| AB | 28 | Approval Status | Approval/admin field |
-| AC | 29 | Final Start Date | Lifecycle/admin field |
-| AD | 30 | Final End Date | Lifecycle/admin field |
-| AE | 31 | Display Status | Lifecycle/admin field |
 | AM | 39 | WhatsApp - FM/Accounts Notification | Notification field |
 
 The N/O distinction is intentional and must not be reversed:
 
 > **N = Email Address. O = Booking ID.**
 
-## Administrative field names
+The physical positions of other administrative fields must be taken from the live header row. They must not be inferred from a list order or from an earlier version of the sheet.
 
-The EDB administrative layer uses these header names as the logical field identifiers:
+## Logical administrative schema
+
+These are the EDB logical field names. They are identifiers, not a declaration of their physical column positions:
 
 1. Booking ID
 2. Media File Name
@@ -65,8 +54,6 @@ The EDB administrative layer uses these header names as the logical field identi
 18. Final End Date
 19. Display Status
 
-Exact physical positions of any field not explicitly confirmed above must be obtained from the live header row. Do not infer positions from the order of this list.
-
 ## Authoritative lookup rule
 
 For every booking lookup:
@@ -74,8 +61,8 @@ For every booking lookup:
 1. Resolve the authoritative Response Sheet using the EDB response-sheet resolver.
 2. Read the complete header row from that same sheet.
 3. Locate `Booking ID` by normalized header name.
-4. Use that resolved zero-based index against the row values from the same sheet/range.
-5. Never use `14`, `15`, `N`, `O`, or any other physical position as the Booking ID lookup key in application logic.
+4. Use that resolved zero-based index against row values read from the same sheet/range.
+5. Never use `13`, `14`, `15`, `N`, `O`, or any other physical position as the Booking ID lookup key in application logic.
 
 The same header-driven rule applies to Payment Status, Approval Status, dates, media fields, resident fields and all other operational fields.
 
@@ -91,4 +78,4 @@ The Test Lab is a separate controlled environment and must be resolved through i
 
 ## Data protection
 
-Do not place response rows, resident details, payment information, media files or uploaded media in GitHub. This file contains schema metadata only.
+Do not place response rows, resident details, payment information or uploaded media in GitHub. This file contains schema metadata only.
