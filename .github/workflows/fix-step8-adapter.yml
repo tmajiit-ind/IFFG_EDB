@@ -1,9 +1,10 @@
 name: Fix Step 8 adapter
 
 on:
-  push:
+  pull_request:
+    types: [opened, synchronize]
     branches:
-      - fix/step8-dynamic-booking-test
+      - main
 
 permissions:
   contents: write
@@ -12,10 +13,10 @@ jobs:
   repair:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout branch
+      - name: Checkout head branch
         uses: actions/checkout@v4
         with:
-          ref: fix/step8-dynamic-booking-test
+          ref: ${{ github.head_ref }}
           fetch-depth: 0
 
       - name: Repair duplicate adapter and lifecycle call
@@ -109,4 +110,4 @@ jobs:
           git add development-audit/EDB_DISPLAYBOARD_LIVE.js
           git rm .github/workflows/fix-step8-adapter.yml
           git commit -m "Fix Step 8 booking adapter"
-          git push origin HEAD:fix/step8-dynamic-booking-test
+          git push origin HEAD:${{ github.head_ref }}
