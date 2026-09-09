@@ -19,16 +19,36 @@ The Google Form and Google Sheets remain live Workspace assets and are **not sto
 | Column | Field |
 |---|---|
 | N | Email Address |
-| O | Booking ID |
+| **O** | **Booking ID** |
 | P | Media File Name |
 | AM | WhatsApp - FM/Accounts Notification |
 
+**Structural rule: N is Email Address; O is Booking ID. They must never be treated as interchangeable.**
+
 The Production spreadsheet contains live operational information. Do not copy Production rows or personal/payment data into GitHub.
+
+## Response Sheet lookup contract
+
+The physical mapping above is reference metadata, not an application lookup rule.
+
+Application and test code must:
+
+1. Resolve the authoritative Response Sheet.
+2. Read the complete live header row from that sheet.
+3. Find `Booking ID` by normalized header name.
+4. Use that resolved index with row values from the same sheet/range.
+5. Resolve all other operational fields by header name in the same way.
+
+No application or regression code should assume a fixed Booking ID column such as N, O, index 13, index 14 or index 15.
+
+The full logical administrative schema and confirmed physical mappings are maintained in `PRODUCTION_SHEET_SCHEMA.md`.
 
 ## Development & Audit
 
 - Development & Audit Apps Script project ID: `1mQEnQrnIjqOxkCQd2lU6ZeXCp4xT8yDvTS5p-bpIKZixLGHwo4rY_dbr`
 - This project contains diagnostic, audit, regression, sandbox and operational test code.
+
+Development and audit code must use the same Response Sheet lookup contract as Production. A test must not introduce a second hardcoded schema or hardcoded Production spreadsheet reference.
 
 ## Test Lab
 

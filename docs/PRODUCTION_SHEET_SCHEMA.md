@@ -1,30 +1,38 @@
-# IFFG EDB - Production Response Sheet Schema
+# IFFG EDB - Authoritative Response Sheet Schema
+
+## Purpose
+
+This document is the structural reference for the IFFG Electronic Display Board response sheet.
+
+**Critical rule:** physical column letters are reference information only. Application code must resolve fields by their header names from the live header row. Code must not assume that `N` means Booking ID.
 
 ## Sheet identity
 
-- Spreadsheet ID: `1hHdFRgj1YnBqQATLd94iEGuRDqxOIsQEd8w1DKmYQfQ`
-- Sheet: `Form Responses 1`
-- GID: `1024710807`
-- Total columns currently established: 39 (`A:AM`)
+- Production spreadsheet: `1hHdFRgj1YnBqQATLd94iEGuRDqxOIsQEd8w1DKmYQfQ`
+- Production response sheet: `Form Responses 1`
+- Production response sheet GID: `1024710807`
+- Current established width: 39 columns (`A:AM`)
 
-## Important caution
+## Confirmed physical mapping
 
-This document deliberately does **not** invent the complete 39-header list.
+The following physical positions are independently established in the project baseline:
 
-The following positions are independently established in the current project baseline:
+| Column | Sheet column number | Header | Structural role |
+|---|---:|---|---|
+| N | 14 | Email Address | Form response field |
+| **O** | **15** | **Booking ID** | **Primary EDB booking key** |
+| P | 16 | Media File Name | Media/admin field |
+| AM | 39 | WhatsApp - FM/Accounts Notification | Notification field |
 
-| Column | Header |
-|---|---|
-| N | Email Address |
-| O | Booking ID |
-| P | Media File Name |
-| AM | WhatsApp - FM/Accounts Notification |
+The N/O distinction is intentional and must not be reversed:
 
-The remaining original Google Form response headers should be documented from the live header row when that row is available. Production response data is not required for this documentation.
+> **N = Email Address. O = Booking ID.**
 
-## Production/admin columns established by the current core code
+The physical positions of other administrative fields must be taken from the live header row. They must not be inferred from a list order or from an earlier version of the sheet.
 
-The Production Apps Script contains an `ensureAdminColumns()` definition with these required administrative fields:
+## Logical administrative schema
+
+These are the EDB logical field names. They are identifiers, not a declaration of their physical column positions:
 
 1. Booking ID
 2. Media File Name
@@ -42,19 +50,32 @@ The Production Apps Script contains an `ensureAdminColumns()` definition with th
 14. Approval Status
 15. Requested Start Date
 16. Requested End Date
+17. Final Start Date
+18. Final End Date
+19. Display Status
 
-These names are code-defined administrative requirements. Their exact physical column positions should be taken from the live sheet rather than inferred.
+## Authoritative lookup rule
 
-## Resolver rule
+For every booking lookup:
 
-The Production core identifies the response sheet by locating a sheet whose header row contains a normalized `Timestamp` header. It does not rely solely on a hardcoded sheet name.
+1. Resolve the authoritative Response Sheet using the EDB response-sheet resolver.
+2. Read the complete header row from that same sheet.
+3. Locate `Booking ID` by normalized header name.
+4. Use that resolved zero-based index against row values read from the same sheet/range.
+5. Never use `13`, `14`, `15`, `N`, `O`, or any other physical position as the Booking ID lookup key in application logic.
 
-## Booking ID
+The same header-driven rule applies to Payment Status, Approval Status, dates, media fields, resident fields and all other operational fields.
 
-Booking ID is a key operational field used throughout the EDB booking-selection, audit and display workflows.
+## Response-sheet resolver
 
-Examples of valid Test Lab Booking IDs are documented in `GOOGLE_WORKSPACE_ARCHITECTURE.md`.
+The production core identifies the response sheet by locating a sheet whose header row contains a normalized `Timestamp` header. It does not rely solely on a hardcoded sheet name.
+
+## Test and development rule
+
+Development, audit and regression code must follow the same header-driven lookup contract as production code. Tests must not introduce a second schema by hardcoding a physical Booking ID position or by opening a different hardcoded Production spreadsheet.
+
+The Test Lab is a separate controlled environment and must be resolved through its own configured/test context.
 
 ## Data protection
 
-Do not place response rows, resident details, payment information, media files or other operational data in GitHub. This file is a schema/reference document only.
+Do not place response rows, resident details, payment information or uploaded media in GitHub. This file contains schema metadata only.

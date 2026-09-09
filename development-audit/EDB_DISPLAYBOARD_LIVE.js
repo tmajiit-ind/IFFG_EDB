@@ -10620,7 +10620,7 @@ function getEDBBookingForNewUI(bookingId) {
 
     lifecycle: String(
       typeof getEDBAutomaticDisplayState === 'function'
-        ? getEDBAutomaticDisplayState(values, headers)
+        ? getEDBAutomaticDisplayState(values, headerMap)
         : ''
     )
   };
@@ -10631,52 +10631,3 @@ function getEDBBookingForNewUI(bookingId) {
    READ ONLY
    ============================================================ */
 
-function getEDBBookingForNewUI(bookingId) {
-
-  var id = String(bookingId || '').trim();
-
-  if (!id) {
-    throw new Error('Booking ID is required.');
-  }
-
-  var ss = SpreadsheetApp.openById(
-    '1hHdFRgj1YnBqQATLd94iEGuRDqxOIsQEd8w1DKmYQfQ'
-  );
-
-  var context =
-    getB7BookingDataContext(ss);
-
-  var selected =
-    getB7SelectedBooking(
-      context,
-      id
-    );
-
-  if (!selected) {
-    throw new Error('Booking ID not found: ' + id);
-  }
-
-  var headers = selected.headers || [];
-  var values = selected.values || [];
-  var headerMap = getEDBHeaderMap(selected.responseSheet);
-
-  function value(names) {
-    return getEDBValue(values, headerMap, names);
-  }
-
-  return {
-    bookingId: id,
-    rowNumber: selected.rowNumber,
-    flat: String(value(['Flat Number', 'Flat']) || ''),
-    resident: String(value(['Name', 'Resident Name', 'Resident']) || ''),
-    content: String(value(['Advertisement Content', 'Content', 'Description']) || ''),
-    payment: String(value(['Payment Status']) || ''),
-    displayStart: value(['Confirmed Start Date', 'Display Start Date', 'Start Date']),
-    displayEnd: value(['Confirmed End Date', 'Display End Date', 'End Date']),
-    lifecycle: String(
-      typeof getEDBAutomaticDisplayState === 'function'
-        ? getEDBAutomaticDisplayState(values, headers)
-        : ''
-    )
-  };
-}
